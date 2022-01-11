@@ -28,7 +28,26 @@ describe('[Challenge] Truster', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE  */
+        /*
+         * Explanation:
+         * 
+         * The pool allows the user to borrow an arbitrary ammount of tokens
+         * and then make a function call to a target contract. After the
+         * function call, the contract expects the balance to be greater or
+         * equal to the initial balance, otherwise, the transaction is
+         * reverted.
+         * 
+         * As specified in the ERC-20 standard, allowance can be
+         * given to spend an amount of tokens in behalf of the owner. This can
+         * be used by the attacker to use the arbitrary call to allow the
+         * attacker to transfer the tokens, and after the loan has been paid
+         * back (so the contract does not revert the transaction), the attacker
+         * can transfer the tokens from the contract to themselves.
+         * 
+         */
+
+        const ExploitFactory = await ethers.getContractFactory('TrusterExploit', attacker);
+        await ExploitFactory.deploy(this.pool.address);
     });
 
     after(async function () {

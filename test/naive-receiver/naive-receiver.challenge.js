@@ -30,7 +30,27 @@ describe('[Challenge] Naive receiver', function () {
     });
 
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */   
+        /*
+         * Explanation:
+         * 
+         * The pool has a fixed flash loan fee of 1 ether, regardless of the
+         * amount that is borrowed. The flash loan receiver only accepts calls
+         * from the pool, making it impossible to target directly, but the pool
+         * itself can arbitrarily call any contract's `receiveEther` function.
+         * The direct call has the contract as the `msg.sender`, and the
+         * `borrowAmount` as the `msg.value`. This call can be triggered by
+         * anyone, so an attacker can call the `flashLoan` function with the
+         * victim's address and any borrow amount, and the pool will drain the
+         * victim contract's funds.
+         * 
+         * The attack can be made by manually calling the function 10 times (or
+         * the amount that is needed to drain the victim's funds), or by
+         * deploying a contract that loops over 10 function calls.
+         * 
+         */
+        const ExploitFactory = await ethers.getContractFactory('NaiveReceiverExploit', attacker);
+        await ExploitFactory.deploy(this.pool.address, this.receiver.address);
+
     });
 
     after(async function () {

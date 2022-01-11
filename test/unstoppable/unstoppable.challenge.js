@@ -36,10 +36,24 @@ describe('[Challenge] Unstoppable', function () {
          const ReceiverContractFactory = await ethers.getContractFactory('ReceiverUnstoppable', someUser);
          this.receiverContract = await ReceiverContractFactory.deploy(this.pool.address);
          await this.receiverContract.executeFlashLoan(10);
-    });
-
+        });
+        
     it('Exploit', async function () {
-        /** CODE YOUR EXPLOIT HERE */
+    /* 
+     * Explanation:
+     *
+     * Since the DVT token implements the ERC-20 specification, the accounts
+     * balance logic is already implemented in the token contract. The pool
+     * (wrongly) implements its own way to keep track of the balance that is
+     * deposited  in the `depositTokens` function. An attacker can circumvent
+     * this process by using the standard ERC-20 token transfer to send tokens
+     * directly to the pool, which, in turn, doesn't update the balance that is
+     * locally stored in the contract, and as a consequence, the function call
+     * to `flashLoan` always throws and reverts the transaction.
+     * 
+     */
+    
+        await this.token.connect(attacker).transfer(this.pool.address, 1);
     });
 
     after(async function () {
